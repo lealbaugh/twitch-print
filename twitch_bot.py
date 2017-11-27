@@ -25,7 +25,7 @@ import select
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BOARD)
 import printer
-p = printer.ThermalPrinter()
+# p = printer.ThermalPrinter()
 from textwrap import wrap
 
 
@@ -102,7 +102,7 @@ def process_response(response):
 		# actually should store message in a dict by username (so only one vote person)
 		# but that will be harder to debug right now
 		print(username + ": " + message)
-		printFormatted(message)
+		# printFormatted(message)
 
 
 # Current main process loop; polls the socket and reads out messages when they are ready
@@ -126,10 +126,10 @@ def read_loop(callback):
 # read_loop(process_response)
 
 print "Bot ready!"
-p.linefeed(5)
-p.font_b()
-p.print_text("Alive and connecting to channel: "+ twitch_config.CHAN)
-p.linefeed(5)
+# p.linefeed(5)
+# p.font_b()
+# p.print_text("Alive and connecting to channel: "+ twitch_config.CHAN)
+# p.linefeed(5)
 
 try:
 	while True:
