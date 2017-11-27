@@ -33,7 +33,7 @@ from subprocess import call
 
 
 messages = []
-on = False
+processOn = False
 
 # ------ From the Twitchbot Instructable: ------ 
 # a regex for parsing the returned message; compile it here and use it in the message receiving bit
@@ -79,9 +79,9 @@ def printFormatted(text, characters=30):
 				p.print_text(line+"\n")
 
 def shutdown(whatever):
-	if (on):
+	if (processOn):
 		call("sudo shutdown -h now", shell=True)
-		on = False
+		processOn = False
 	else:
 		print "I would be shutting down now"
 
