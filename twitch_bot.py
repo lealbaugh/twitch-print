@@ -38,12 +38,6 @@ messages = []
 # a regex for parsing the returned message; compile it here and use it in the message receiving bit
 CHAT_MSG=re.compile(r"^:\w+!\w+@\w+\.tmi\.twitch\.tv PRIVMSG #\w+ :")
 
-# initiate the socket connection
-s = socket.socket()
-s.connect((twitch_config.HOST, twitch_config.PORT))
-s.send("PASS {}\r\n".format(twitch_config.PASS).encode("utf-8"))
-s.send("NICK {}\r\n".format(twitch_config.NICK).encode("utf-8"))
-s.send("JOIN {}\r\n".format(twitch_config.CHAN).encode("utf-8"))
 
 # Some Twitch channel mod functionality
 def chat(sock, msg):
@@ -83,14 +77,22 @@ def printFormatted(text, characters=30):
 		for line in lines:
 				p.print_text(line+"\n")
 
+on = false
+def shutdown():
+	if (on):
+		call("sudo shutdown -h now", shell=True)
+		on = false
+	else:
+		print "I would be shutting down now"
 
-# # Paying attention to buttons (from fortune machine code -- we'll use this later for shutdown)
-# # On the edge
-# GPIO.setup(32, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
 
-# # when a falling edge is detected on port 17, regardless of whatever
-# # else is happening in the program, the function my_callback will be run
-# GPIO.add_event_detect(32, GPIO.RISING, callback=vend, bouncetime=300)
+# Paying attention to buttons (from fortune machine code -- we're using this for shutdown)
+# On the edge
+GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+# when a falling edge is detected on port 17, regardless of whatever
+# else is happening in the program, the callback function will be run
+GPIO.add_event_detect(15, GPIO.FALLING, callback=shutdown, bouncetime=300)
 # ------ end of hardware functions ------ 
 
 def process_response(response):
@@ -106,8 +108,7 @@ def process_response(response):
 		# but that will be harder to debug right now
 		print(username + ": " + message)
 		# printFormatted(message)
-		if (message == "die pi"):
-			call("sudo shutdown -h now", shell=True)
+			
 
 
 # Current main process loop; polls the socket and reads out messages when they are ready
@@ -130,7 +131,17 @@ def read_loop(callback):
 
 # read_loop(process_response)
 
-print "Bot ready!"
+print "Starting up."
+
+# time.sleep(20); # when we have the code running on startup, this will allow wifi connection
+
+# initiate the socket connection
+s = socket.socket()
+s.connect((twitch_config.HOST, twitch_config.PORT))
+s.send("PASS {}\r\n".format(twitch_config.PASS).encode("utf-8"))
+s.send("NICK {}\r\n".format(twitch_config.NICK).encode("utf-8"))
+s.send("JOIN {}\r\n".format(twitch_config.CHAN).encode("utf-8"))
+
 # p.linefeed(5)
 # p.font_b()
 # p.print_text("Alive and connecting to channel: "+ twitch_config.CHAN)
