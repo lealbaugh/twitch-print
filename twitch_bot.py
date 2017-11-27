@@ -106,7 +106,7 @@ def process_response(response):
 		# but that will be harder to debug right now
 		print(username + ": " + message)
 		# printFormatted(message)
-		if (message is "die pi"):
+		if (message == "die pi"):
 			call("sudo shutdown -h now", shell=True)
 
 
