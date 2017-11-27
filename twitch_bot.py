@@ -78,7 +78,7 @@ def printFormatted(text, characters=30):
 		for line in lines:
 				p.print_text(line+"\n")
 
-def shutdown():
+def shutdown(whatever):
 	if (checkOn):
 		call("sudo shutdown -h now", shell=True)
 		checkOn = False
