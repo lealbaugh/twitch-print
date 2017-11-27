@@ -33,7 +33,6 @@ from subprocess import call
 
 
 messages = []
-processOn = False
 
 # ------ From the Twitchbot Instructable: ------ 
 # a regex for parsing the returned message; compile it here and use it in the message receiving bit
@@ -78,13 +77,22 @@ def printFormatted(text, characters=30):
 		for line in lines:
 				p.print_text(line+"\n")
 
-def shutdown(whatever):
-	if (processOn):
+on = False
+def shutdown():
+	if (on):
 		call("sudo shutdown -h now", shell=True)
-		processOn = False
+		on = False
 	else:
 		print "I would be shutting down now"
 
+
+# # Paying attention to buttons (from fortune machine code -- we're using this for shutdown)
+# # On the edge
+# GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+# # when a falling edge is detected on port 17, regardless of whatever
+# # else is happening in the program, the callback function will be run
+# GPIO.add_event_detect(15, GPIO.FALLING, callback=shutdown, bouncetime=300)
 # ------ end of hardware functions ------ 
 
 def process_response(response):
@@ -138,14 +146,6 @@ s.send("JOIN {}\r\n".format(twitch_config.CHAN).encode("utf-8"))
 # p.font_b()
 # p.print_text("Alive and connecting to channel: "+ twitch_config.CHAN)
 # p.linefeed(5)
-
-# Paying attention to buttons (from fortune machine code -- we're using this for shutdown)
-# On the edge
-GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
-# when a falling edge is detected on port 17, regardless of whatever
-# else is happening in the program, the callback function will be run
-GPIO.add_event_detect(15, GPIO.FALLING, callback=shutdown, bouncetime=300)
 
 try:
 	while True:
