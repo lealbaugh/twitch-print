@@ -24,6 +24,7 @@ import select
 # imports for printing
 import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BOARD)
+
 import printer
 # p = printer.ThermalPrinter()
 from textwrap import wrap
@@ -31,7 +32,7 @@ from textwrap import wrap
 # import for powering off, as in https://www.raspberrypi.org/forums/viewtopic.php?t=133665
 from subprocess import call
 
-
+checkOn = False
 messages = []
 
 # ------ From the Twitchbot Instructable: ------ 
@@ -77,22 +78,21 @@ def printFormatted(text, characters=30):
 		for line in lines:
 				p.print_text(line+"\n")
 
-on = False
 def shutdown():
-	if (on):
+	if (checkOn):
 		call("sudo shutdown -h now", shell=True)
-		on = False
+		checkOn = False
 	else:
 		print "I would be shutting down now"
 
 
-# # Paying attention to buttons (from fortune machine code -- we're using this for shutdown)
-# # On the edge
-# GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+# Paying attention to buttons (from fortune machine code -- we're using this for shutdown)
+# On the edge
+GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-# # when a falling edge is detected on port 17, regardless of whatever
-# # else is happening in the program, the callback function will be run
-# GPIO.add_event_detect(15, GPIO.FALLING, callback=shutdown, bouncetime=300)
+# when a falling edge is detected on port 17, regardless of whatever
+# else is happening in the program, the callback function will be run
+GPIO.add_event_detect(15, GPIO.FALLING, callback=shutdown, bouncetime=300)
 # ------ end of hardware functions ------ 
 
 def process_response(response):
