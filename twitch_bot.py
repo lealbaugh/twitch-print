@@ -81,7 +81,6 @@ def printFormatted(text, characters=30):
 def shutdown(whatever):
 	if (checkOn):
 		call("sudo shutdown -h now", shell=True)
-		checkOn = False
 	else:
 		print "I would be shutting down now"
 
