@@ -4,6 +4,9 @@
 # and Hardmath123's IRC socket-reading tutorial at
 # https://hardmath123.github.io/socket-science-2.html
 
+# Also integrates button interrupts by Alex Eames http://RasPi.tv
+# http://RasPi.tv/how-to-use-interrupts-with-python-on-the-raspberry-pi-and-rpi-gpio-part-3
+
 # relies on a config file (for authentication to Twitch) that you can ask Lea for
 
 # Necessary pieces:
@@ -11,16 +14,24 @@
 #   strip out Dewey decimal numbers
 #   send messages to printer
 
+# imports for reading twitch channel
 import twitch_config
 import socket
 import re
 import time
 import select
-from collections import Counter
+
+# imports for printing
+import RPi.GPIO as GPIO
+GPIO.setmode(GPIO.BOARD)
+import printer
+p = printer.ThermalPrinter()
+from textwrap import wrap
+
 
 messages = []
 
-# ------ From the Instructable: ------ 
+# ------ From the Twitchbot Instructable: ------ 
 # a regex for parsing the returned message; compile it here and use it in the message receiving bit
 CHAT_MSG=re.compile(r"^:\w+!\w+@\w+\.tmi\.twitch\.tv PRIVMSG #\w+ :")
 
@@ -33,77 +44,95 @@ s.send("JOIN {}\r\n".format(twitch_config.CHAN).encode("utf-8"))
 
 # Some Twitch channel mod functionality
 def chat(sock, msg):
-    """
-    Send a chat message to the server.
-    Keyword arguments:
-    sock -- the socket over which to send the message
-    msg  -- the message to be sent
-    """
-    sock.send("PRIVMSG #{} :{}".format(twitch_config.CHAN, msg))
+	"""
+	Send a chat message to the server.
+	Keyword arguments:
+	sock -- the socket over which to send the message
+	msg  -- the message to be sent
+	"""
+	sock.send("PRIVMSG #{} :{}".format(twitch_config.CHAN, msg))
 
 def ban(sock, user):
-    """
-    Ban a user from the current channel.
-    Keyword arguments:
-    sock -- the socket over which to send the ban command
-    user -- the user to be banned
-    """
-    chat(sock, ".ban {}".format(user))
+	"""
+	Ban a user from the current channel.
+	Keyword arguments:
+	sock -- the socket over which to send the ban command
+	user -- the user to be banned
+	"""
+	chat(sock, ".ban {}".format(user))
 
 def timeout(sock, user, secs=600):
-    """
-    Time out a user for a set period of time.
-    Keyword arguments:
-    sock -- the socket over which to send the timeout command
-    user -- the user to be timed out
-    secs -- the length of the timeout in seconds (default 600)
-    """
-    chat(sock, ".timeout {}".format(user, secs))
+	"""
+	Time out a user for a set period of time.
+	Keyword arguments:
+	sock -- the socket over which to send the timeout command
+	user -- the user to be timed out
+	secs -- the length of the timeout in seconds (default 600)
+	"""
+	chat(sock, ".timeout {}".format(user, secs))
 
 # ------ end of functions from Instructable ------ 
 
-def process_response(response):
-    if response == "PING :tmi.twitch.tv\r\n":
-        s.send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
-        print("(pong)")
-    else:
-        username = re.search(r"\w+", response).group(0) # return the entire match
-        message = CHAT_MSG.sub("", response)
-        if (username != "tmi" and username != "PING"):
-            messages.append(message)
-        # actually should store message in a dict by username (so only one vote person)
-        # but that will be harder to debug right now
-        print(username + ": " + message)
 
-def parse_votes():
-    votes = []
-    for message in messages:
-        vote = re.search(r'\d', message)
-        if (vote):
-            votes.append(int(vote.group(0)))
-    if (len(votes) > 0):
-        most_popular = Counter(votes).most_common()
-        print "!!! VOTE TALLY: !!!"
-        print most_popular
+# ------ hardware-related functions ------ 
+def printFormatted(text, characters=30):
+		lines = ['\n'.join(wrap(block, width=characters)) for block in text.splitlines()]
+		for line in lines:
+				p.print_text(line+"\n")
+
+
+# # Paying attention to buttons (from fortune machine code -- we'll use this later for shutdown)
+# # On the edge
+# GPIO.setup(32, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+# # when a falling edge is detected on port 17, regardless of whatever
+# # else is happening in the program, the function my_callback will be run
+# GPIO.add_event_detect(32, GPIO.RISING, callback=vend, bouncetime=300)
+# ------ end of hardware functions ------ 
+
+def process_response(response):
+	if response == "PING :tmi.twitch.tv\r\n":
+		s.send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
+		print("(pong)")
+	else:
+		username = re.search(r"\w+", response).group(0) # return the entire match
+		message = CHAT_MSG.sub("", response)
+		if (username != "tmi" and username != "PING"):
+			messages.append(message)
+		# actually should store message in a dict by username (so only one vote person)
+		# but that will be harder to debug right now
+		print(username + ": " + message)
+		printFormatted(message)
+
 
 # Current main process loop; polls the socket and reads out messages when they are ready
 # Based on the hardmath123 tutorial.
 def read_loop(callback):
-    data = ""
-    CRLF = '\r\n'
-    while True:
-        messages = []
-        time.sleep(5) # prevent CPU hogging -- we will actually replace this with only checking when we want a new pick
-        readables, writables, exceptionals = select.select([s], [s], [s]) 
-        if len(readables) == 1:
-            data += s.recv(512);
-            while CRLF in data:
-                message = data[:data.index(CRLF)]
-                data = data[data.index(CRLF)+2:]
-                callback(message)
-            parse_votes()
+	data = ""
+	CRLF = '\r\n'
+	while True:
+		messages = []
+		time.sleep(5) # prevent CPU hogging
+		readables, writables, exceptionals = select.select([s], [s], [s]) 
+		if len(readables) == 1:
+			data += s.recv(512);
+			while CRLF in data:
+				message = data[:data.index(CRLF)]
+				data = data[data.index(CRLF)+2:]
+				callback(message)
 
 # ============ And then make it go =============
 
-read_loop(process_response)
+# read_loop(process_response)
 
+print "Bot ready!"
+p.linefeed(5)
+p.font_b()
+p.print_text("Alive and connecting to channel: "+ twitch_config.CHAN)
+p.linefeed(5)
+
+try:
+	while True:
+		read_loop(process_response)
+finally:
+		GPIO.cleanup()
