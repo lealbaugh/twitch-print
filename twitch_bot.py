@@ -28,6 +28,9 @@ import printer
 # p = printer.ThermalPrinter()
 from textwrap import wrap
 
+# import for powering off, as in https://www.raspberrypi.org/forums/viewtopic.php?t=133665
+from subprocess import call
+
 
 messages = []
 
@@ -103,6 +106,8 @@ def process_response(response):
 		# but that will be harder to debug right now
 		print(username + ": " + message)
 		# printFormatted(message)
+		if (message is "die pi"):
+			call("sudo shutdown -h now", shell=True)
 
 
 # Current main process loop; polls the socket and reads out messages when they are ready
