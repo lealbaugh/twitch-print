@@ -102,10 +102,6 @@ GPIO.add_event_detect(15, GPIO.FALLING, callback=shutdown, bouncetime=300)
 # ------ end of hardware functions ------ 
 dewey_validator=re.compile(r"[a-zA-Z]{1,3}\s*\d{1,5}\s*\.[a-zA-Z]\d{1,5}\s*[\w]{2,4}\s*\d{0,4}")
 
-def checkForDewewyAndPrint(message):
-	for match in dewey_validator.findall(message):
-		printFormatted(match)
-
 def process_response(response):
 	if response == "PING :tmi.twitch.tv\r\n":
 		s.send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
@@ -113,16 +109,14 @@ def process_response(response):
 	else:
 		username = re.search(r"\w+", response).group(0) # return the entire match
 		message = CHAT_MSG.sub("", response)
-		if (username == "tmi" and "welcome" in message):
-			printFormatted("Connected to Twitch.")
-		if (username != "tmi" and username != "PING"):
-			messages.append(message)
-		# actually should store message in a dict by username (so only one vote person)
-		# but that will be harder to debug right now
+		if (username == "tmi"):
 			print(username + ": " + message)
-			checkForDewewyAndPrint(message)
-			
-
+			if ("welcome" in message):
+				printFormatted("Connected to Twitch.")
+		if (username != "tmi" and username != "PING"):
+			print(username + ": " + message)
+			for match in dewey_validator.findall(message):
+				printFormatted(match)
 
 # Current main process loop; polls the socket and reads out messages when they are ready
 # Based on the hardmath123 tutorial.
