@@ -26,7 +26,7 @@ import RPi.GPIO as GPIO
 GPIO.setmode(GPIO.BOARD)
 
 import printer
-# p = printer.ThermalPrinter()
+p = printer.ThermalPrinter()
 from textwrap import wrap
 
 # import for powering off, as in https://www.raspberrypi.org/forums/viewtopic.php?t=133665
@@ -106,7 +106,7 @@ def process_response(response):
 		# actually should store message in a dict by username (so only one vote person)
 		# but that will be harder to debug right now
 		print(username + ": " + message)
-		# printFormatted(message)
+		printFormatted(message)
 			
 
 
@@ -141,10 +141,10 @@ s.send("PASS {}\r\n".format(twitch_config.PASS).encode("utf-8"))
 s.send("NICK {}\r\n".format(twitch_config.NICK).encode("utf-8"))
 s.send("JOIN {}\r\n".format(twitch_config.CHAN).encode("utf-8"))
 
-# p.linefeed(5)
-# p.font_b()
-# p.print_text("Alive and connecting to channel: "+ twitch_config.CHAN)
-# p.linefeed(5)
+p.linefeed(5)
+p.font_b()
+p.print_text("Alive and connecting to channel: "+ twitch_config.CHAN)
+p.linefeed(5)
 
 try:
 	while True:
