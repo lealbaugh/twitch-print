@@ -100,7 +100,7 @@ GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 # else is happening in the program, the callback function will be run
 GPIO.add_event_detect(15, GPIO.FALLING, callback=shutdown, bouncetime=300)
 # ------ end of hardware functions ------ 
-dewey_validator=re.compile(r"[a-zA-Z]{2}\d{4}\s*\.[a-zA-Z]\d{4}\s[\w]{2,3}\s\d{4}")
+dewey_validator=re.compile(r"[a-zA-Z]{1,3}\s*\d{1,5}\s*\.[a-zA-Z]\d{1,5}\s*[\w]{2,4}\s*\d{0,4}")
 
 def checkForDewewyAndPrint(message):
 	for match in dewey_validator.findall(message):
