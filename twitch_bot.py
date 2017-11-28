@@ -32,8 +32,7 @@ from textwrap import wrap
 # import for powering off, as in https://www.raspberrypi.org/forums/viewtopic.php?t=133665
 from subprocess import call
 
-checkOn = False
-messages = []
+reallyShutDown = True
 
 # ------ From the Twitchbot Instructable: ------ 
 # a regex for parsing the returned message; compile it here and use it in the message receiving bit
@@ -86,7 +85,7 @@ def printFormatted(text, characters=40):
 
 def shutdown(whatever):
 	printFormatted("~*goodnight*~")
-	if (checkOn):
+	if (reallyShutDown):
 		call("sudo shutdown -h now", shell=True)
 	else:
 		print "I would be shutting down now"
