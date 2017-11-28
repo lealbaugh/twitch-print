@@ -73,12 +73,19 @@ def timeout(sock, user, secs=600):
 
 
 # ------ hardware-related functions ------ 
-def printFormatted(text, characters=30):
-		lines = ['\n'.join(wrap(block, width=characters)) for block in text.splitlines()]
-		for line in lines:
-				p.print_text(line+"\n")
+def printFormatted(text, characters=40):
+	p.wake()
+	p.linefeed(5)
+	p.bold()
+	lines = ['\n'.join(wrap(block, width=characters)) for block in text.splitlines()]
+	for line in lines:
+		p.print_text(line+"\n")
+	p.linefeed(5)
+	p.sleep()
+
 
 def shutdown(whatever):
+	printFormatted("~*goodnight*~")
 	if (checkOn):
 		call("sudo shutdown -h now", shell=True)
 	else:
@@ -93,6 +100,11 @@ GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 # else is happening in the program, the callback function will be run
 GPIO.add_event_detect(15, GPIO.FALLING, callback=shutdown, bouncetime=300)
 # ------ end of hardware functions ------ 
+dewey_validator=re.compile(r"^:\w+!\w+@\w+\.tmi\.twitch\.tv PRIVMSG #\w+ :")
+
+def checkForDewewyAndPrint(message):
+	for match in dewey_validator.findall(message):
+		printFormatted(match)
 
 def process_response(response):
 	if response == "PING :tmi.twitch.tv\r\n":
@@ -101,12 +113,14 @@ def process_response(response):
 	else:
 		username = re.search(r"\w+", response).group(0) # return the entire match
 		message = CHAT_MSG.sub("", response)
+		if (username == "tmi" and "welcome" in message):
+			printFormatted("Connected to Twitch.")
 		if (username != "tmi" and username != "PING"):
 			messages.append(message)
 		# actually should store message in a dict by username (so only one vote person)
 		# but that will be harder to debug right now
-		print(username + ": " + message)
-		printFormatted(message)
+			print(username + ": " + message)
+			checkForDewewyAndPrint(message)
 			
 
 
@@ -141,10 +155,7 @@ s.send("PASS {}\r\n".format(twitch_config.PASS).encode("utf-8"))
 s.send("NICK {}\r\n".format(twitch_config.NICK).encode("utf-8"))
 s.send("JOIN {}\r\n".format(twitch_config.CHAN).encode("utf-8"))
 
-p.linefeed(5)
-p.font_b()
-p.print_text("Alive and connecting to channel: "+ twitch_config.CHAN)
-p.linefeed(5)
+printFormatted("Alive and connecting to channel:\n"+ twitch_config.CHAN)
 
 try:
 	while True:
