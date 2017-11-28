@@ -111,7 +111,7 @@ def process_response(response):
 		message = CHAT_MSG.sub("", response)
 		if (username == "tmi"):
 			print(username + ": " + message)
-			if ("welcome" in message):
+			if ("Welcome" in message):
 				printFormatted("Connected to Twitch.")
 		if (username != "tmi" and username != "PING"):
 			print(username + ": " + message)
