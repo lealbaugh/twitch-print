@@ -140,7 +140,8 @@ def read_loop(callback):
 
 print "Starting up."
 
-# time.sleep(20); # when we have the code running on startup, this will allow wifi connection
+time.sleep(10); # when we have the code running on startup, this will allow wifi connection
+printFormatted("Computer is awake. Attempting connection to channel:\n"+ twitch_config.CHAN)
 
 # initiate the socket connection
 s = socket.socket()
@@ -149,7 +150,6 @@ s.send("PASS {}\r\n".format(twitch_config.PASS).encode("utf-8"))
 s.send("NICK {}\r\n".format(twitch_config.NICK).encode("utf-8"))
 s.send("JOIN {}\r\n".format(twitch_config.CHAN).encode("utf-8"))
 
-printFormatted("Alive and connecting to channel:\n"+ twitch_config.CHAN)
 
 try:
 	while True:
