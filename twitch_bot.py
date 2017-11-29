@@ -33,6 +33,7 @@ from textwrap import wrap
 from subprocess import call
 
 reallyShutDown = True
+button_pin = 37
 
 # ------ From the Twitchbot Instructable: ------ 
 # a regex for parsing the returned message; compile it here and use it in the message receiving bit
@@ -91,22 +92,26 @@ def maybePrintMessages(message):
 			text = text + match[0] + " "
 		printFormatted(text)
 
-
+# uses a hacky deglitch as suggested by https://www.raspberrypi.org/forums/viewtopic.php?t=134394
 def shutdown(whatever):
-	printFormatted("~*goodnight*~")
-	if (reallyShutDown):
-		call("sudo shutdown -h now", shell=True)
-	else:
-		print "I would be shutting down now"
+	print "falling edge on pin "+button_pin
+	sleep(0.5) # debounce for 0.5s
+	if GPIO.input(button_pin) == 0:
+		printFormatted("~*goodnight*~")
+		if (reallyShutDown):
+			print "shutting down"
+			call("sudo shutdown -h now", shell=True)
+		else:
+			print "I would be shutting down now"
 
 
 # Paying attention to buttons (from fortune machine code -- we're using this for shutdown)
 # On the edge
-GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-# when a falling edge is detected on port 17, regardless of whatever
+# when a falling edge is detected on pin 37, regardless of whatever
 # else is happening in the program, the callback function will be run
-GPIO.add_event_detect(16, GPIO.FALLING, callback=shutdown, bouncetime=300)
+GPIO.add_event_detect(button_pin, GPIO.FALLING, callback=shutdown, bouncetime=300)
 # ------ end of hardware functions ------ 
 
 def process_response(response):
