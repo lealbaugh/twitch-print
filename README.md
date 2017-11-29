@@ -17,6 +17,7 @@ If we wanted data *from* the printer to the RasPi, we would need a level shifter
 
 For the script to run at startup,
 https://www.raspberrypi.org/documentation/linux/usage/rc-local.md
+(Add `python -u /home/pi/twitch-print/twitch_bot.py 2> /var/log/twitch_bot.err > /var/log/twitch_bot.out &` to the middle of `/etc/rc.local`)
 
 
 Pin setup:
@@ -27,3 +28,9 @@ Pin 8 (txd) to yellow wire of printer
 
 (Printer power black and red to 5-9V 2A power source.)
 
+I had a bit of a runaround trying to ssh into the pi.  Here's a solution, sort of, and an explanation:
+https://raspberrypi.stackexchange.com/questions/4444/enabling-ssh-on-rpi-without-screen-keystrokes-for-raspi-config
+
+Setting up wifi:
+-Register the device's MAC address with CMU's netreg: https://courses.ideate.cmu.edu/16-223/f2014/registering-your-udoo-with-cmu/
+-https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md
