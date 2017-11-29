@@ -88,7 +88,7 @@ def maybePrintMessages(message):
 	if (len(matches)>0):
 		text = ""
 		for match in matches:
-			text = text + match[0]
+			text = text + match[0] + " "
 		printFormatted(text)
 
 
@@ -148,7 +148,7 @@ print "Starting up."
 time.sleep(4); # go at a leisurely pace to allow wifi connection
 printFormatted("Computer is awake.")
 time.sleep(6); # pause a bit more
-printFormatted("Attempting connection to channel:\n"+ twitch_config.CHAN)
+printFormatted("Attempting connection to:\n"+ twitch_config.CHAN)
 
 # initiate the socket connection
 s = socket.socket()
