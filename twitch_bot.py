@@ -74,12 +74,12 @@ def timeout(sock, user, secs=600):
 # ------ hardware-related functions ------ 
 def printFormatted(text, characters=30):
 	p.wake()
-	p.linefeed(2)
+	# p.linefeed(2)
 	p.bold()
 	lines = ['\n'.join(wrap(block, width=characters)) for block in text.splitlines()]
 	for line in lines:
 		p.print_text(line+"\n")
-	p.linefeed(2)
+	p.linefeed(4)
 	p.sleep()
 
 dewey_validator=re.compile(r"([a-zA-Z]{1,3}\s*[\d\.]{1,7}\s*\.[a-zA-Z]\d{1,5}\s*[\w]{2,4}\s*\d{0,4}|(STACKS|OVRSZQ)[\-2-4]{0,2})")
