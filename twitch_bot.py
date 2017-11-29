@@ -111,7 +111,7 @@ GPIO.add_event_detect(15, GPIO.FALLING, callback=shutdown, bouncetime=300)
 
 def process_response(response):
 	# print("RAW:" + response)
-	if ("ping" in response.lower):
+	if ("ping" in response.lower()):
 		print ("(ping)")
 		s.send("PONG :tmi.twitch.tv\r\n".encode("utf-8"))
 		print("(pong)")
