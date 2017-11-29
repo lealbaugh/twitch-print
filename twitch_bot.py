@@ -116,7 +116,7 @@ def process_response(response):
 			print(username + ": " + message)
 			matches = dewey_validator.findall(message)
 			for match in matches:
-				print(match[0])
+				printFormatted(match[0])
 
 # Current main process loop; polls the socket and reads out messages when they are ready
 # Based on the hardmath123 tutorial.
@@ -139,9 +139,10 @@ def read_loop(callback):
 # read_loop(process_response)
 
 print "Starting up."
-
-time.sleep(10); # when we have the code running on startup, this will allow wifi connection
-printFormatted("Computer is awake. Attempting connection to channel:\n"+ twitch_config.CHAN)
+time.sleep(4); # go at a leisurely pace to allow wifi connection
+printFormatted("Computer is awake.")
+time.sleep(6); # pause a bit more
+printFormatted("Attempting connection to channel:\n"+ twitch_config.CHAN)
 
 # initiate the socket connection
 s = socket.socket()
