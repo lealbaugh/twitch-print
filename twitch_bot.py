@@ -72,15 +72,24 @@ def timeout(sock, user, secs=600):
 
 
 # ------ hardware-related functions ------ 
-def printFormatted(text, characters=40):
+def printFormatted(text, characters=30):
 	p.wake()
-	p.linefeed(5)
+	p.linefeed(3)
 	p.bold()
 	lines = ['\n'.join(wrap(block, width=characters)) for block in text.splitlines()]
 	for line in lines:
 		p.print_text(line+"\n")
-	p.linefeed(5)
+	p.linefeed(3)
 	p.sleep()
+
+dewey_validator=re.compile(r"([a-zA-Z]{1,3}\s*[\d\.]{1,7}\s*\.[a-zA-Z]\d{1,5}\s*[\w]{2,4}\s*\d{0,4}|(STACKS|OVRSZQ)[\-2-4]{0,2})")
+def maybePrintMessages(message):
+	matches = dewey_validator.findall(message)
+	if (len(matches)>0):
+		text = ""
+		for match in matches:
+			text = text + match[0]
+		printFormatted(text)
 
 
 def shutdown(whatever):
@@ -99,7 +108,6 @@ GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 # else is happening in the program, the callback function will be run
 GPIO.add_event_detect(15, GPIO.FALLING, callback=shutdown, bouncetime=300)
 # ------ end of hardware functions ------ 
-dewey_validator=re.compile(r"([a-zA-Z]{1,3}\s*[\d\.]{1,7}\s*\.[a-zA-Z]\d{1,5}\s*[\w]{2,4}\s*\d{0,4}|(STACKS|OVRSZQ)[\-2-4]{0,2})")
 
 def process_response(response):
 	if response == "PING :tmi.twitch.tv\r\n":
@@ -114,9 +122,7 @@ def process_response(response):
 				printFormatted("Connected to Twitch.")
 		if (username != "tmi" and username != "PING"):
 			print(username + ": " + message)
-			matches = dewey_validator.findall(message)
-			for match in matches:
-				printFormatted(match[0])
+			maybePrintMessages(message)
 
 # Current main process loop; polls the socket and reads out messages when they are ready
 # Based on the hardmath123 tutorial.
