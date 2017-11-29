@@ -102,11 +102,11 @@ def shutdown(whatever):
 
 # Paying attention to buttons (from fortune machine code -- we're using this for shutdown)
 # On the edge
-GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(16, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 # when a falling edge is detected on port 17, regardless of whatever
 # else is happening in the program, the callback function will be run
-GPIO.add_event_detect(15, GPIO.FALLING, callback=shutdown, bouncetime=300)
+GPIO.add_event_detect(16, GPIO.FALLING, callback=shutdown, bouncetime=300)
 # ------ end of hardware functions ------ 
 
 def process_response(response):
