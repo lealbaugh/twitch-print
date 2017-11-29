@@ -95,7 +95,7 @@ def maybePrintMessages(message):
 # uses a hacky deglitch as suggested by https://www.raspberrypi.org/forums/viewtopic.php?t=134394
 def shutdown(whatever):
 	print "falling edge on pin "+str(button_pin)
-	sleep(0.5) # debounce for 0.5s
+	time.sleep(0.5) # debounce for 0.5s
 	if GPIO.input(button_pin) == 0:
 		printFormatted("~*goodnight*~")
 		if (reallyShutDown):
