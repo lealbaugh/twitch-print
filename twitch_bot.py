@@ -48,6 +48,7 @@ def chat(sock, msg):
 	sock -- the socket over which to send the message
 	msg  -- the message to be sent
 	"""
+	console.log("Sending message: "+msg)
 	sock.send("PRIVMSG #{} :{}".format(twitch_config.CHAN, msg))
 
 def ban(sock, user):
