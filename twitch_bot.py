@@ -84,13 +84,14 @@ def printFormatted(text, characters=30):
 	p.sleep()
 
 dewey_validator=re.compile(r"([a-zA-Z]{1,3}\s*[\d\.]{1,7}\s*\.[a-zA-Z]\d{1,5}\s*[\w]{2,4}\s*\d{0,4}|(STACKS|OVRSZQ)[\-2-4]{0,2})")
-def maybePrintMessages(message):
+def maybePrintMessages(message, sender, socket):
 	matches = dewey_validator.findall(message)
 	if (len(matches)>0):
-		text = ""
+		text = sender+": \n"
 		for match in matches:
-			text = text + match[0] + " "
+			text = text + match[0] + " \n\n"
 		printFormatted(text)
+		chat(socket, "Received from "+text)
 
 # uses a hacky deglitch as suggested by https://www.raspberrypi.org/forums/viewtopic.php?t=134394
 def shutdown(whatever):
@@ -114,7 +115,7 @@ GPIO.setup(button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.add_event_detect(button_pin, GPIO.FALLING, callback=shutdown, bouncetime=300)
 # ------ end of hardware functions ------ 
 
-def process_response(response):
+def process_response(response, socket):
 	# print("RAW:" + response)
 	if ("ping" in response.lower()):
 		print ("(ping)")
@@ -129,7 +130,7 @@ def process_response(response):
 				printFormatted("Connected to Twitch.")
 		if (username != "tmi" and username != "PING"):
 			print(username + ": " + message)
-			maybePrintMessages(message)
+			maybePrintMessages(message, username, socket)
 
 # Current main process loop; polls the socket and reads out messages when they are ready
 # Based on the hardmath123 tutorial.
@@ -167,6 +168,6 @@ s.send("JOIN {}\r\n".format(twitch_config.CHAN).encode("utf-8"))
 
 try:
 	while True:
-		read_loop(process_response)
+		read_loop(process_response, s)
 finally:
 		GPIO.cleanup()
