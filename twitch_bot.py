@@ -135,7 +135,7 @@ def process_response(response, socket):
 
 # Current main process loop; polls the socket and reads out messages when they are ready
 # Based on the hardmath123 tutorial.
-def read_loop(callback):
+def read_loop(callback, socket):
 	data = ""
 	CRLF = '\r\n'
 	while True:
@@ -147,7 +147,7 @@ def read_loop(callback):
 			while CRLF in data:
 				message = data[:data.index(CRLF)]
 				data = data[data.index(CRLF)+2:]
-				callback(message)
+				callback(message, socket)
 
 # ============ And then make it go =============
 
