@@ -50,7 +50,8 @@ def chat(sock, msg):
 	"""
 	msg = msg.replace("\n"," ")
 	print("Sending message: "+msg)
-	sock.send("PRIVMSG #{} :{}".format(twitch_config.CHAN, msg))
+	msg = "PRIVMSG #"+twitch_config.CHAN+" :"+msg + "\r\n"
+	sock.send(msg.encode('utf-8'))
 
 def ban(sock, user):
 	"""
