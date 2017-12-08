@@ -31,8 +31,8 @@ In summary:  There are two options to enable ssh: add a blank "ssh" document to 
 
 ### Wifi
 To automatically connect to CMU's network without needing keyboard and monitor on campus to set up:
-	- Register the device's MAC address with CMU's netreg: https://courses.ideate.cmu.edu/16-223/f2014/registering-your-udoo-with-cmu/
-	- Add the "CMU" network to `/etc/wpa_supplicant/wpa_supplicant.conf` (per https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md) Note that it doesn't have a password, so the proper configuration is:
+* Register the device's MAC address with CMU's netreg: https://courses.ideate.cmu.edu/16-223/f2014/registering-your-udoo-with-cmu/
+* Add the "CMU" network to `/etc/wpa_supplicant/wpa_supplicant.conf` (per https://www.raspberrypi.org/documentation/configuration/wireless/wireless-cli.md) Note that it doesn't have a password, so the proper configuration is:
 ```
 network={
     ssid="CMU"
@@ -45,11 +45,11 @@ For the python script to run at startup, add `python -u /home/pi/twitch-print/tw
 
 ## Hardware configuration
 Wire connections:
-Pin 9 (gnd) to one side of button
-Pin 15 (gpio) to other side of button
-Pin 6 (gnd) to black wire of printer
-Pin 8 (txd) to yellow wire of printer
-Printer power black and red to 5-9V 2A power source
+* Pin 9 (gnd) to one side of button
+* Pin 15 (gpio) to other side of button
+* Pin 6 (gnd) to black wire of printer
+* Pin 8 (txd) to yellow wire of printer
+* Printer power black and red to 5-9V 2A power source
 
 
 Note: If we wanted data *from* the printer to the Pi, we would need a level shifter.  However, the Pi's 3v3 signal is sufficient to pass messages *to* the printer.  My understanding is that the only message the printer is capable of sending back to the Pi is an "out of paper" warning, which we really didn't care about for this project.
