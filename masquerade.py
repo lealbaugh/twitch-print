@@ -94,7 +94,7 @@ GPIO.add_event_detect(button_pin, GPIO.FALLING, callback=shutdown, bouncetime=30
 
 # duplicate that for the request button
 GPIO.setup(fortune_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-GPIO.add_event_detect(button_pin, GPIO.FALLING, callback=printFortune, bouncetime=300)
+GPIO.add_event_detect(fortune_pin, GPIO.FALLING, callback=printFortune, bouncetime=300)
 
 
 
