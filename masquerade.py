@@ -40,18 +40,7 @@ fortune_pin = 33
 
 
 # ------ hardware-related functions ------ 
-# This function adds linebreaks to format the text nicely for the printer, then sends the job to the printer
-# It also puts the printer out of and back into its low-power mode because I was worried about excessive power consumption
-# for a battery-powered device. This adds a wee bit of lag, but like, the game already has a massive amount of lag in the system.
-def printFormatted(text, characters=30):
-	p.wake()
-	# p.linefeed(2)
-	p.bold()
-	lines = ['\n'.join(wrap(block, width=characters)) for block in text.splitlines()]
-	for line in lines:
-		p.print_text(line+"\n")
-	p.linefeed(4)
-	p.sleep()
+
 
 # This function is called whenever the GPIO system detects a falling edge on the button pin (see line 120)
 def shutdown(whatever):
@@ -72,6 +61,34 @@ def shutdown(whatever):
 			print "I would be shutting down now"
 
 # ------ grab & print a fortune ------ 
+
+possibleStars = ["*", "*", "*", "*", "*", "*", ".",".",".",".", ":", "~", ",", "`", "'", "-"]
+def starfield():
+  stars = ""
+  for i in range(4):
+      for j in range(30):
+          if (random.randint(0,20) <=1):
+              stars = stars + random.sample(possibleStars, 1)[0]
+          else:
+              stars = stars + " "
+      stars = stars + "\n"
+  return stars
+
+# This function adds linebreaks to format the text nicely for the printer, then sends the job to the printer
+# It also puts the printer out of and back into its low-power mode because I was worried about excessive power consumption
+# for a battery-powered device. This adds a wee bit of lag, but like, the game already has a massive amount of lag in the system.
+def printFormatted(text, characters=30):
+	p.wake()
+	# p.linefeed(2)
+	p.bold()
+	lines = ['\n'.join(wrap(block, width=characters)) for block in text.splitlines()]
+	p.print_text(starfield())
+	for line in lines:
+		p.print_text(line+"\n")
+	p.print_text(starfield())
+	p.linefeed(4)
+	p.sleep()
+
 def printFortune(whatever):
 	fortune = random.choice(fortunes)
 	printFormatted(fortune)
