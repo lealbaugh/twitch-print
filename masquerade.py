@@ -77,6 +77,11 @@ def shutdown(whatever):
 			# this was for debugging
 			print "I would be shutting down now"
 
+# ------ grab & print a fortune ------ 
+def printFortune(whatever):
+	fortune = random.choice(fortunes)
+	printFormatted(fortune)
+
 
 # This sets up the button pin as an input.  Since I wired the button between pin and ground, we want a pullup resistor.
 # This will hold the signal up unless the button is pressed, at which point the signal will go low.
@@ -91,10 +96,6 @@ GPIO.add_event_detect(button_pin, GPIO.FALLING, callback=shutdown, bouncetime=30
 GPIO.setup(fortune_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.add_event_detect(button_pin, GPIO.FALLING, callback=printFortune, bouncetime=300)
 
-# ------ grab & print a fortune ------ 
-def printFortune(whatever):
-	fortune = random.choice(fortunes)
-	printFormatted(fortune)
 
 
 
